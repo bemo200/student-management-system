@@ -1,17 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>نظام إدارة بيانات الطلاب</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>إدارة الطلاب</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-white p-4">
   <div class="max-w-7xl mx-auto">
     <header class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">📘 نظام إدارة بيانات الطلاب</h1>
-      <button id="addBtn" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg">إضافة طالب</button>
+      <h1 class="text-2xl font-bold">📘 إدارة الطلاب (Firebase)</h1>
+      <button id="addBtn" class="bg-emerald-500 px-4 py-2 rounded-lg">إضافة طالب</button>
     </header>
 
     <input id="search" type="text" placeholder="🔍 ابحث..." class="w-full mb-4 p-2 rounded-lg text-black">
@@ -21,15 +20,12 @@
         <thead class="bg-gray-800">
           <tr>
             <th class="px-3 py-2">#</th>
-            <th class="px-3 py-2">رقم الطالب</th>
             <th class="px-3 py-2">الاسم</th>
-            <th class="px-3 py-2">البريد الإلكتروني</th>
+            <th class="px-3 py-2">البريد</th>
             <th class="px-3 py-2">الهاتف</th>
             <th class="px-3 py-2">الصف</th>
             <th class="px-3 py-2">الدرجة</th>
-            <th class="px-3 py-2">الجنس</th>
             <th class="px-3 py-2">الحالة</th>
-            <th class="px-3 py-2">تاريخ الإضافة</th>
             <th class="px-3 py-2">إجراءات</th>
           </tr>
         </thead>
@@ -44,16 +40,11 @@
       <h2 class="text-xl mb-4" id="modalTitle">إضافة طالب</h2>
       <form id="studentForm" class="space-y-3">
         <input type="hidden" id="studentId"/>
-        <input required id="code" placeholder="رقم الطالب" class="w-full p-2 rounded text-black">
-        <input required id="name" placeholder="اسم الطالب" class="w-full p-2 rounded text-black">
-        <input required type="email" id="email" placeholder="البريد الإلكتروني" class="w-full p-2 rounded text-black">
-        <input required id="phone" placeholder="رقم الهاتف" class="w-full p-2 rounded text-black">
-        <input required id="class" placeholder="الصف" class="w-full p-2 rounded text-black">
-        <input required type="number" id="grade" placeholder="الدرجة" class="w-full p-2 rounded text-black">
-        <select id="gender" class="w-full p-2 rounded text-black">
-          <option value="ذكر">ذكر</option>
-          <option value="أنثى">أنثى</option>
-        </select>
+        <input required id="name"  placeholder="اسم الطالب"     class="w-full p-2 rounded text-black">
+        <input required id="email" type="email" placeholder="البريد الإلكتروني" class="w-full p-2 rounded text-black">
+        <input required id="phone" placeholder="رقم الهاتف"    class="w-full p-2 rounded text-black">
+        <input required id="class" placeholder="الصف"          class="w-full p-2 rounded text-black">
+        <input required id="grade" type="number" placeholder="الدرجة" class="w-full p-2 rounded text-black">
         <select id="status" class="w-full p-2 rounded text-black">
           <option value="نشط">نشط</option>
           <option value="موقوف">موقوف</option>
@@ -61,7 +52,7 @@
         </select>
         <div class="flex justify-end gap-2">
           <button type="button" id="cancel" class="px-4 py-2 bg-gray-500 rounded">إلغاء</button>
-          <button type="submit" class="px-4 py-2 bg-emerald-600 rounded">حفظ</button>
+          <button type="submit"         class="px-4 py-2 bg-emerald-600 rounded">حفظ</button>
         </div>
       </form>
     </div>
