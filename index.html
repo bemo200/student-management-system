@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,58 +7,93 @@
   <title>إدارة الطلاب</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
+<div id="splash" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+  <h1 class="text-3xl font-bold animate-pulse">جاري التحميل...</h1>
+</div>
+<script>
+  window.addEventListener('load', ()=>{
+    document.getElementById('splash').remove();
+  });
+</script>
+
 <body class="bg-slate-900 text-white p-4">
-  <div class="max-w-7xl mx-auto">
-    <header class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">📘 إدارة الطلاب (Firebase)</h1>
-      <button id="addBtn" class="bg-emerald-500 px-4 py-2 rounded-lg">إضافة طالب</button>
-    </header>
 
-    <input id="search" type="text" placeholder="🔍 ابحث..." class="w-full mb-4 p-2 rounded-lg text-black">
-
-    <div class="overflow-x-auto">
-      <table id="studentsTable" class="min-w-full divide-y divide-gray-700">
-        <thead class="bg-gray-800">
-          <tr>
-            <th class="px-3 py-2">#</th>
-            <th class="px-3 py-2">الاسم</th>
-            <th class="px-3 py-2">البريد</th>
-            <th class="px-3 py-2">الهاتف</th>
-            <th class="px-3 py-2">الصف</th>
-            <th class="px-3 py-2">الدرجة</th>
-            <th class="px-3 py-2">الحالة</th>
-            <th class="px-3 py-2">إجراءات</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-700"></tbody>
-      </table>
+  <!-- شاشة تسجيل الدخول بكلمة سر -->
+  <div id="loginScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center">
+    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-sm">
+      <h2 class="text-xl mb-4 text-center">كلمة مرور الدخول</h2>
+      <input id="accessPass" type="password" placeholder="••••••••" class="w-full p-2 mb-4 rounded text-black">
+      <button onclick="checkPassword()" class="bg-emerald-600 w-full py-2 rounded">دخول</button>
+      <p id="errorMsg" class="text-red-400 text-center hidden mt-2">كلمة السر غير صحيحة</p>
     </div>
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
-    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-      <h2 class="text-xl mb-4" id="modalTitle">إضافة طالب</h2>
-      <form id="studentForm" class="space-y-3">
-        <input type="hidden" id="studentId"/>
-        <input required id="name"  placeholder="اسم الطالب"     class="w-full p-2 rounded text-black">
-        <input required id="email" type="email" placeholder="البريد الإلكتروني" class="w-full p-2 rounded text-black">
-        <input required id="phone" placeholder="رقم الهاتف"    class="w-full p-2 rounded text-black">
-        <input required id="class" placeholder="الصف"          class="w-full p-2 rounded text-black">
-        <input required id="grade" type="number" placeholder="الدرجة" class="w-full p-2 rounded text-black">
-        <select id="status" class="w-full p-2 rounded text-black">
-          <option value="نشط">نشط</option>
-          <option value="موقوف">موقوف</option>
-          <option value="تحت المراجعة">تحت المراجعة</option>
-        </select>
-        <div class="flex justify-end gap-2">
-          <button type="button" id="cancel" class="px-4 py-2 bg-gray-500 rounded">إلغاء</button>
-          <button type="submit"         class="px-4 py-2 bg-emerald-600 rounded">حفظ</button>
-        </div>
-      </form>
+  <div id="appRoot" class="hidden">
+    <div class="max-w-7xl mx-auto">
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">📘 إدارة الطلاب (محمية بكلمة سر)</h1><button id="toggleTheme" class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600">🌙</button>
+        <button id="addBtn" class="bg-emerald-500 px-4 py-2 rounded-lg">إضافة طالب</button>
+      </header>
+
+      <input id="search" type="text" placeholder="🔍 ابحث..." class="w-full mb-4 p-2 rounded-lg text-black">
+
+      <div class="overflow-x-auto">
+        <table id="studentsTable" class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-800">
+            <tr>
+              <th class="px-3 py-2">#</th>
+              <th class="px-3 py-2">الاسم</th>
+              <th class="px-3 py-2">البريد</th>
+              <th class="px-3 py-2">الهاتف</th>
+              <th class="px-3 py-2">الصف</th>
+              <th class="px-3 py-2">الدرجة</th>
+              <th class="px-3 py-2">الحالة</th>
+              <th class="px-3 py-2">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl mb-4" id="modalTitle">إضافة طالب</h2>
+        <form id="studentForm" class="space-y-3">
+          <input type="hidden" id="studentId"/>
+          <input required id="name"  placeholder="اسم الطالب"     class="w-full p-2 rounded text-black">
+          <input required id="email" type="email" placeholder="البريد الإلكتروني" class="w-full p-2 rounded text-black">
+          <input required id="phone" placeholder="رقم الهاتف"    class="w-full p-2 rounded text-black">
+          <input required id="class" placeholder="الصف"          class="w-full p-2 rounded text-black">
+          <input required id="grade" type="number" placeholder="الدرجة" class="w-full p-2 rounded text-black">
+          <select id="status" class="w-full p-2 rounded text-black">
+            <option value="نشط">نشط</option>
+            <option value="موقوف">موقوف</option>
+            <option value="تحت المراجعة">تحت المراجعة</option>
+          </select>
+          <div class="flex justify-end gap-2">
+            <button type="button" id="cancel" class="px-4 py-2 bg-gray-500 rounded">إلغاء</button>
+            <button type="submit"         class="px-4 py-2 bg-emerald-600 rounded">حفظ</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
-<script src="app.js"></script>
+  <script>
+    function checkPassword() {
+      const pass = document.getElementById('accessPass').value;
+      const error = document.getElementById('errorMsg');
+      if(pass === 'Talaba@2025') {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('appRoot').classList.remove('hidden');
+      } else {
+        error.classList.remove('hidden');
+      }
+    }
+  </script>
+  <script src="app.js"></script>
 </body>
 </html>

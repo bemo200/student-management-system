@@ -1,5 +1,5 @@
 // 👈 استبدل الرابط أدناه برابط قاعدة بيانات Firebase الخاصة بك
-const DB_URL = 'https://edarattalaba-default-rtdb.firebaseio.com';
+const DB_URL = 'https://YOUR_PROJECT.firebaseio.com';
 
 const tbody = document.querySelector('#studentsTable tbody');
 const modal = document.getElementById('modal');
@@ -94,3 +94,25 @@ document.getElementById('search').addEventListener('input', e=>{
 });
 
 fetchStudents();
+
+
+// تغيير الثيم (فاتح/داكن)
+const themeBtn = document.getElementById('toggleTheme');
+function applyTheme(theme){
+  document.body.classList.toggle('bg-slate-900', theme === 'dark');
+  document.body.classList.toggle('bg-white', theme === 'light');
+  document.body.classList.toggle('text-white', theme === 'dark');
+  document.body.classList.toggle('text-black', theme === 'light');
+  themeBtn.textContent = theme === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('theme', theme);
+}
+
+themeBtn?.addEventListener('click', ()=>{
+  const current = localStorage.getItem('theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+});
+
+window.addEventListener('load', ()=>{
+  applyTheme(localStorage.getItem('theme') || 'dark');
+});
