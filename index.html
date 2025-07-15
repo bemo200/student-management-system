@@ -1,82 +1,62 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Edarat Talaba • Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.17/dist/full.css" rel="stylesheet" type="text/css" />
-<style>
-  body{background:linear-gradient(135deg,#1f2937 0%,#111827 100%);}
-  .glass{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>إدارة الطلاب</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 text-white font-[Cairo]">
+<body class="bg-slate-900 text-white p-4">
+  <div class="max-w-7xl mx-auto">
+    <header class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">📘 إدارة الطلاب (Firebase)</h1>
+      <button id="addBtn" class="bg-emerald-500 px-4 py-2 rounded-lg">إضافة طالب</button>
+    </header>
 
-<!-- Navbar -->
-<nav class="w-full glass rounded-2xl mb-6 flex items-center justify-between px-6 py-3">
-  <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 fill-emerald-400" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v13l-5-2-5 2-5-2-5 2V5a2 2 0 0 1 2-2z"/></svg>
-    إدارة الطلاب
-  </h1>
-  <div class="flex items-center gap-3">
-    <label class="swap swap-rotate">
-      <input type="checkbox" id="toggleTheme"/>
-      <svg class="swap-on fill-yellow-400 w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64 17.657A9 9 0 1 1 18.364 4.93a7 7 0 1 0-12.73 12.728z"/></svg>
-      <svg class="swap-off fill-sky-400 w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3h.02A7 7 0 0 0 21 12.79z"/></svg>
-    </label>
-    <button id="addBtn" class="btn btn-success btn-sm">+ طالب</button>
-  </div>
-</nav>
+    <input id="search" type="text" placeholder="🔍 ابحث..." class="w-full mb-4 p-2 rounded-lg text-black">
 
-<!-- Search bar -->
-<div class="w-full mb-4">
-  <input id="search" type="text" placeholder="🔍 بحث عن طالب..." class="input input-bordered w-full glass text-white placeholder-gray-400">
-</div>
-
-<!-- Table container -->
-<div class="w-full overflow-x-auto glass rounded-2xl p-2">
-<table id="studentsTable" class="table table-zebra table-pin-rows [&_th]:text-center">
-  <thead>
-    <tr class="text-emerald-300">
-      <th>#</th><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الصف</th><th>الدرجة</th><th>الحالة</th><th>إجراءات</th>
-    </tr>
-  </thead>
-  <tbody class="text-center"></tbody>
-</table>
-</div>
-
-<!-- Floating Toast -->
-<div id="toast" class="toast toast-top toast-center hidden">
-  <div class="alert alert-success">
-    <span id="toastMsg"></span>
-  </div>
-</div>
-
-<!-- Modal -->
-<dialog id="modal" class="modal">
-  <form method="dialog" class="modal-box glass text-white">
-    <h3 class="font-bold text-lg mb-4" id="modalTitle">إضافة طالب</h3>
-    <div class="grid grid-cols-1 gap-3">
-      <input type="hidden" id="studentId">
-      <input id="name" class="input glass" placeholder="الاسم" required>
-      <input id="email" class="input glass" placeholder="البريد الإلكتروني" required>
-      <input id="phone" class="input glass" placeholder="رقم الهاتف" required>
-      <input id="class" class="input glass" placeholder="الصف" required>
-      <input id="grade" type="number" class="input glass" placeholder="الدرجة" required>
-      <select id="status" class="select glass">
-        <option value="نشط">نشط</option>
-        <option value="موقوف">موقوف</option>
-        <option value="تحت المراجعة">تحت المراجعة</option>
-      </select>
+    <div class="overflow-x-auto">
+      <table id="studentsTable" class="min-w-full divide-y divide-gray-700">
+        <thead class="bg-gray-800">
+          <tr>
+            <th class="px-3 py-2">#</th>
+            <th class="px-3 py-2">الاسم</th>
+            <th class="px-3 py-2">البريد</th>
+            <th class="px-3 py-2">الهاتف</th>
+            <th class="px-3 py-2">الصف</th>
+            <th class="px-3 py-2">الدرجة</th>
+            <th class="px-3 py-2">الحالة</th>
+            <th class="px-3 py-2">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-700"></tbody>
+      </table>
     </div>
-    <div class="modal-action">
-      <button type="submit" class="btn btn-primary">حفظ</button>
-      <button type="button" class="btn" id="cancel">إلغاء</button>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div class="bg-gray-800 p-6 rounded-lg w-full max-w-md">
+      <h2 class="text-xl mb-4" id="modalTitle">إضافة طالب</h2>
+      <form id="studentForm" class="space-y-3">
+        <input type="hidden" id="studentId"/>
+        <input required id="name"  placeholder="اسم الطالب"     class="w-full p-2 rounded text-black">
+        <input required id="email" type="email" placeholder="البريد الإلكتروني" class="w-full p-2 rounded text-black">
+        <input required id="phone" placeholder="رقم الهاتف"    class="w-full p-2 rounded text-black">
+        <input required id="class" placeholder="الصف"          class="w-full p-2 rounded text-black">
+        <input required id="grade" type="number" placeholder="الدرجة" class="w-full p-2 rounded text-black">
+        <select id="status" class="w-full p-2 rounded text-black">
+          <option value="نشط">نشط</option>
+          <option value="موقوف">موقوف</option>
+          <option value="تحت المراجعة">تحت المراجعة</option>
+        </select>
+        <div class="flex justify-end gap-2">
+          <button type="button" id="cancel" class="px-4 py-2 bg-gray-500 rounded">إلغاء</button>
+          <button type="submit"         class="px-4 py-2 bg-emerald-600 rounded">حفظ</button>
+        </div>
+      </form>
     </div>
-  </form>
-</dialog>
+  </div>
 
 <script src="app.js"></script>
 </body>
