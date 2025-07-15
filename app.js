@@ -1,118 +1,115 @@
-// 👈 استبدل الرابط أدناه برابط قاعدة بيانات Firebase الخاصة بك
-const DB_URL = 'https://YOUR_PROJECT.firebaseio.com';
+
+const DB_URL = 'https://edarattalaba-default-rtdb.firebaseio.com';
 
 const tbody = document.querySelector('#studentsTable tbody');
 const modal = document.getElementById('modal');
-const form  = document.getElementById('studentForm');
+const form  = document.querySelector('.modal-box form');
 const addBtn = document.getElementById('addBtn');
 const cancelBtn = document.getElementById('cancel');
 const modalTitle = document.getElementById('modalTitle');
-let editMode   = false;
-let studentKeys = [];
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
+
+let editMode=false;
+let studentKeys=[];
+
+function showToast(msg){
+  toastMsg.textContent=msg;
+  toast.classList.remove('hidden');
+  setTimeout(()=>toast.classList.add('hidden'),2000);
+}
 
 function fetchStudents(){
-  fetch(DB_URL + '/students.json')
-    .then(res => res.json())
-    .then(data => {
-      tbody.innerHTML = '';
-      studentKeys = [];
+  fetch(DB_URL+'/students.json')
+    .then(r=>r.json())
+    .then(data=>{
+      tbody.innerHTML='';
+      studentKeys=[];
       if(!data) return;
-      Object.entries(data).forEach(([key, s], idx)=>{
+      Object.entries(data).forEach(([key,s],idx)=>{
         studentKeys.push(key);
-        tbody.insertAdjacentHTML('beforeend', `
+        tbody.insertAdjacentHTML('beforeend',`
           <tr>
-            <td class="px-3 py-2">${idx+1}</td>
-            <td class="px-3 py-2">${s.name}</td>
-            <td class="px-3 py-2">${s.email}</td>
-            <td class="px-3 py-2">${s.phone}</td>
-            <td class="px-3 py-2">${s.class}</td>
-            <td class="px-3 py-2">${s.grade}%</td>
-            <td class="px-3 py-2">
-              <span class="px-2 py-1 rounded ${s.status==='نشط'?'bg-green-600':s.status==='موقوف'?'bg-red-600':'bg-yellow-600'}">${s.status}</span>
+            <td>${idx+1}</td>
+            <td>${s.name}</td>
+            <td>${s.email}</td>
+            <td>${s.phone}</td>
+            <td>${s.class}</td>
+            <td>${s.grade}%</td>
+            <td>
+              <span class="badge ${s.status==='نشط'?'badge-success':s.status==='موقوف'?'badge-error':'badge-warning'}">${s.status}</span>
             </td>
-            <td class="px-3 py-2">
-              <button onclick="editStudent(${idx})"   class="text-emerald-400">✏️</button>
-              <button onclick="deleteStudent(${idx})" class="text-red-500">🗑️</button>
+            <td>
+              <button onclick="editStudent(${idx})" class="btn btn-xs btn-info">تعديل</button>
+              <button onclick="deleteStudent(${idx})" class="btn btn-xs btn-error">حذف</button>
             </td>
           </tr>`);
       });
     });
 }
 
-function openModal(){ modal.classList.remove('hidden'); }
-function closeModal(){ modal.classList.add('hidden'); form.reset(); editMode=false; }
+addBtn.addEventListener('click',()=>{
+  form.reset(); editMode=false; modalTitle.textContent='إضافة طالب';
+  modal.showModal();
+});
+cancelBtn.addEventListener('click',()=>modal.close());
 
-addBtn.addEventListener('click', ()=>{ openModal(); modalTitle.textContent='إضافة طالب'; });
-cancelBtn.addEventListener('click', closeModal);
-
-form.addEventListener('submit', e=>{
+form.addEventListener('submit',e=>{
   e.preventDefault();
-  const student = {
-    name  : form.name.value,
-    email : form.email.value,
-    phone : form.phone.value,
-    class : form.class.value,
-    grade : form.grade.value,
-    status: form.status.value
+  const student={
+    name:form.name.value,email:form.email.value,phone:form.phone.value,
+    class:form.class.value,grade:form.grade.value,status:form.status.value
   };
   if(editMode){
-    const key = studentKeys[form.studentId.value];
-    fetch(`${DB_URL}/students/${key}.json`, {method:'PUT', body:JSON.stringify(student)})
-      .then(()=>{closeModal(); fetchStudents();});
+    const key=studentKeys[form.studentId.value];
+    fetch(DB_URL+'/students/'+key+'.json',{method:'PUT',body:JSON.stringify(student)})
+      .then(()=>{modal.close();fetchStudents();showToast('تم التعديل');});
   }else{
-    fetch(`${DB_URL}/students.json`, {method:'POST', body:JSON.stringify(student)})
-      .then(()=>{closeModal(); fetchStudents();});
+    fetch(DB_URL+'/students.json',{method:'POST',body:JSON.stringify(student)})
+      .then(()=>{modal.close();fetchStudents();showToast('تمت الإضافة');});
   }
 });
 
 function editStudent(i){
-  const key = studentKeys[i];
-  fetch(`${DB_URL}/students/${key}.json`)
+  const key=studentKeys[i];
+  fetch(DB_URL+'/students/'+key+'.json')
     .then(r=>r.json())
     .then(s=>{
-      openModal(); modalTitle.textContent='تعديل طالب'; editMode=true;
+      editMode=true; modalTitle.textContent='تعديل طالب';
       form.studentId.value=i;
-      Object.assign(form,{
-        name:{value:s.name},email:{value:s.email},phone:{value:s.phone},
-        class:{value:s.class},grade:{value:s.grade}});
+      form.name.value=s.name;
+      form.email.value=s.email;
+      form.phone.value=s.phone;
+      form.class.value=s.class;
+      form.grade.value=s.grade;
       form.status.value=s.status;
+      modal.showModal();
     });
 }
 
 function deleteStudent(i){
-  if(!confirm('حذف الطالب نهائيًا؟')) return;
-  const key = studentKeys[i];
-  fetch(`${DB_URL}/students/${key}.json`, {method:'DELETE'})
-    .then(()=>fetchStudents());
+  if(!confirm('حذف الطالب؟')) return;
+  const key=studentKeys[i];
+  fetch(DB_URL+'/students/'+key+'.json',{method:'DELETE'})
+    .then(()=>{fetchStudents();showToast('تم الحذف');});
 }
 
-document.getElementById('search').addEventListener('input', e=>{
-  const q = e.target.value.toLowerCase();
+// search
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
   [...tbody.children].forEach(tr=>{
-    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+    tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';
   });
 });
 
-fetchStudents();
-
-
-// تغيير الثيم (فاتح/داكن)
-const themeBtn = document.getElementById('toggleTheme');
-function applyTheme(theme){
-  document.body.classList.toggle('bg-slate-900', theme === 'dark');
-  document.body.classList.toggle('bg-white', theme === 'light');
-  document.body.classList.toggle('text-white', theme === 'dark');
-  document.body.classList.toggle('text-black', theme === 'light');
-  themeBtn.textContent = theme === 'dark' ? '🌙' : '☀️';
-  localStorage.setItem('theme', theme);
+// theme toggle
+const themeBtn=document.getElementById('toggleTheme');
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'cupcake');
+  themeBtn.checked=t==='light';
+  localStorage.setItem('theme',t);
 }
+themeBtn.addEventListener('change',()=>applyTheme(themeBtn.checked?'light':'dark'));
+applyTheme(localStorage.getItem('theme')||'dark');
 
-themeBtn?.addEventListener('click', ()=>{
-  const current = localStorage.getItem('theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-});
-
-window.addEventListener('load', ()=>{
-  applyTheme(localStorage.getItem('theme') || 'dark');
-});
+fetchStudents();
